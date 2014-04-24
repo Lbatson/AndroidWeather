@@ -1,13 +1,16 @@
 package edu.apsu.csci4020.batson_kuwonu.weather;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SearchDialogFragment.SearchDialogListener{
 
     public TextView mainTemperatureText;
     private WeatherAPI weatherAPI;
@@ -36,11 +39,24 @@ public class MainActivity extends Activity {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_search:
+                FragmentManager fm = getFragmentManager();
+                SearchDialogFragment searchDialogFragment = new SearchDialogFragment();
+                searchDialogFragment.show(fm, "fragment_search");
                 return true;
             case R.id.action_gps:
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onSearchPositiveClick(DialogFragment dialogFragment, String zip_code_value) {
+        Log.i("SEARCH", zip_code_value);
+    }
+
+    @Override
+    public void onSearchNegativeClick(DialogFragment dialogFragment) {
+        Log.i("SEARCH", "CANCEL");
     }
 }
