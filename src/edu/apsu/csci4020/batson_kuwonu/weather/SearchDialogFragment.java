@@ -15,7 +15,6 @@ public class SearchDialogFragment extends DialogFragment{
 
     public interface SearchDialogListener {
         public void onSearchPositiveClick(DialogFragment dialogFragment, String zip_code_value);
-        public void onSearchNegativeClick(DialogFragment dialogFragment);
     }
 
     // Use this instance of the interface to deliver action events
@@ -32,20 +31,14 @@ public class SearchDialogFragment extends DialogFragment{
         // Pass null as the parent view because its going in the dialog layout
         final View view = inflater.inflate(R.layout.dialog_search, null);
         builder.setView(view)
-                .setMessage("Search below with your zip code")
-                .setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                .setMessage(getResources().getString(R.string.search_title))
+                .setPositiveButton(getResources().getString(R.string.search_positive), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         EditText et = (EditText) view.findViewById(R.id.et_zip_code);
-                        // TODO: determine valid zip code or not (5 numbers) first
                         mListener.onSearchPositiveClick(SearchDialogFragment.this, et.getText().toString());
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                        mListener.onSearchNegativeClick(SearchDialogFragment.this);
-                    }
-                });
+                .setNegativeButton(getResources().getString(R.string.search_negative), null);
         // Create the AlertDialog object and return it
         return builder.create();
     }

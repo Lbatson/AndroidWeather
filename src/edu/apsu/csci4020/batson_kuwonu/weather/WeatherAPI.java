@@ -13,20 +13,24 @@ import org.json.JSONObject;
 
 public class WeatherAPI {
 
-    private static final String API_URL =
-        "http://api.wunderground.com/api/44e104dc3950125e/" +
-        "conditions/forecast10day/hourly/q/";
-    private MainActivity context;
+    public interface WeatherAPIListener {
+        public void onWeatherInfoRetrieved(JSONObject responseData, boolean error);
+    }
+
+    private WeatherAPIListener mListener;
+    private String API_URL;
     private JSONObject responseValues;
 
     public WeatherAPI(MainActivity context) {
-        this.context = context;
+        mListener = (WeatherAPIListener) context;
+        API_URL = context.getResources().getString(R.string.api_url);
     }
 
-    public void retrieveWeatherInfo(String location) {
+    public DownloadTask retrieveWeatherInfo(String location) {
         // Request weather info on separate thread
         DownloadTask downloadTask = new DownloadTask();
         downloadTask.execute(location);
+        return downloadTask;
     }
 
     public class DownloadTask extends AsyncTask<String, Void, Void> {
@@ -65,16 +69,16 @@ public class WeatherAPI {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            // Get response object and check for error
+            // Send response or error json object back to listener
             try {
                 JSONObject checker = responseValues.getJSONObject("response");
                 if (checker.has("error")) {
-                    JSONObject jsonErr = checker.getJSONObject("error");
-                    String err = jsonErr.getString("description");
-                    Log.i("RESPONSE", "error: " + err);
-                    context.mainTemperatureText.setText("error: " + err);
+                    JSONObject responseErr = checker.getJSONObject("error");
+                    mListener.onWeatherInfoRetrieved(responseErr, true);
                 }
                 else {
-                    context.mainTemperatureText.setText(responseValues.toString());
+                    mListener.onWeatherInfoRetrieved(responseValues, false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
