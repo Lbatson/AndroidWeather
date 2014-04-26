@@ -1,5 +1,6 @@
 package edu.apsu.csci4020.batson_kuwonu.weather;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 import org.apache.http.HttpEntity;
@@ -21,7 +22,7 @@ public class WeatherAPI {
     private String API_URL;
     private JSONObject responseValues;
 
-    public WeatherAPI(MainActivity context) {
+    public WeatherAPI(Activity context) {
         mListener = (WeatherAPIListener) context;
         API_URL = context.getResources().getString(R.string.api_url);
     }
