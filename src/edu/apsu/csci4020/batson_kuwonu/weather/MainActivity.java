@@ -53,6 +53,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     @Override
     public void onSearchPositiveClick(DialogFragment dialogFragment, String zip_code_value) {
         Log.i("SEARCH", zip_code_value);
+        weatherAPI.retrieveWeatherInfo(zip_code_value);
     }
 
     @Override

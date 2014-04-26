@@ -1,12 +1,14 @@
 package edu.apsu.csci4020.batson_kuwonu.weather;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class WeatherAPI {
@@ -63,7 +65,20 @@ public class WeatherAPI {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            context.mainTemperatureText.setText(responseValues.toString());
+            try {
+                JSONObject checker = responseValues.getJSONObject("response");
+                if (checker.has("error")) {
+                    JSONObject jsonErr = checker.getJSONObject("error");
+                    String err = jsonErr.getString("description");
+                    Log.i("RESPONSE", "error: " + err);
+                    context.mainTemperatureText.setText("error: " + err);
+                }
+                else {
+                    context.mainTemperatureText.setText(responseValues.toString());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
