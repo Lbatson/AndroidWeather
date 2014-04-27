@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.*;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +16,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     private WeatherAPI.DownloadTask downloadTask;
 
     public TextView mainTemperatureText;
+    public RelativeLayout progressLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,14 +24,15 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         setContentView(R.layout.main);
 
         // Initial setup
-        mainTemperatureText = (TextView) findViewById(R.id.mainTemperatureText);
+        mainTemperatureText = (TextView) findViewById(R.id.tv_main_temp);
+        progressLayout = (RelativeLayout) findViewById(R.id.layout_progress);
         weatherAPI = new WeatherAPI(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // Stop retrieving weather data on pause
+        // Stop retrieving weather data
         if (downloadTask != null) {
             downloadTask.cancel(true);
             downloadTask = null;
@@ -67,11 +67,14 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
 
     @Override
     public void onSearchPositiveClick(DialogFragment dialogFragment, String zip_code_value) {
+        // Request weather data from zip code entry
+        progressLayout.setVisibility(View.VISIBLE);
         downloadTask = weatherAPI.retrieveWeatherInfo(zip_code_value);
     }
 
     @Override
     public void onWeatherInfoRetrieved(JSONObject responseData, boolean error) {
+        progressLayout.setVisibility(View.INVISIBLE);
         try {
             if (error) {
                 String err = responseData.getString("description");

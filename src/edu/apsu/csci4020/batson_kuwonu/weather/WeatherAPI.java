@@ -2,7 +2,6 @@ package edu.apsu.csci4020.batson_kuwonu.weather;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.util.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

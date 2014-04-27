@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -31,7 +30,7 @@ public class SearchDialogFragment extends DialogFragment{
         // Pass null as the parent view because its going in the dialog layout
         final View view = inflater.inflate(R.layout.dialog_search, null);
         builder.setView(view)
-                .setMessage(getResources().getString(R.string.search_title))
+                .setTitle(getResources().getString(R.string.search_title))
                 .setPositiveButton(getResources().getString(R.string.search_positive), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         EditText et = (EditText) view.findViewById(R.id.et_zip_code);
