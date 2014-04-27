@@ -78,10 +78,10 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         try {
             if (error) {
                 String err = responseData.getString("description");
-                mainTemperatureText.setText("Error: " + err);
+                mainTemperatureText.setText("N/A");
             } else {
                 JSONObject current = responseData.getJSONObject("current_observation");
-                mainTemperatureText.setText("Current temp in F: " + current.getDouble("temp_f"));
+                mainTemperatureText.setText(current.getInt("temp_f") + "\u00B0");
             }
         } catch (JSONException e) {
             e.printStackTrace();
