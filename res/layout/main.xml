@@ -10,8 +10,30 @@
                 android:layout_height="wrap_content"
                 android:textSize="80dp"
                 android:gravity="center_vertical|center_horizontal"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 android:id="@+id/tv_main_temp"/>
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="40dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_marginTop="120dp"
+                android:id="@+id/tv_condition"/>
+        <!--<HorizontalScrollView-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content">-->
+            <!--<ListView-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="220dp"-->
+                    <!--android:id="@+id/lv_hourly_forecast"/>-->
+        <!--</HorizontalScrollView>-->
+        <ListView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_condition"
+                android:clickable="false"
+                android:id="@+id/lv_daily_forecast"/>
     </RelativeLayout>
     <RelativeLayout
             android:id="@+id/layout_progress"
