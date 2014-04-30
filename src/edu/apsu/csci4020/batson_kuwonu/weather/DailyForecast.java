@@ -5,6 +5,7 @@ public class DailyForecast {
 
     private String weekday;
     private Integer day;
+    private String conditions;
     private Integer high_f;
     private Integer low_f;
     private Integer high_c;
@@ -13,9 +14,10 @@ public class DailyForecast {
     public DailyForecast() {
     }
 
-    public DailyForecast(String weekday, Integer day, Integer high_f, Integer low_f, Integer high_c, Integer low_c) {
+    public DailyForecast(String weekday, Integer day, String conditions, Integer high_f, Integer low_f, Integer high_c, Integer low_c) {
         this.weekday = weekday;
         this.day = day;
+        this.conditions = conditions;
         this.high_f = high_f;
         this.high_c = high_c;
         this.low_f = low_f;
@@ -36,6 +38,14 @@ public class DailyForecast {
 
     public void setDay(Integer day) {
         this.day = day;
+    }
+
+    public String getCondition() {
+        return conditions;
+    }
+
+    public void setCondition(String condition) {
+        this.conditions = condition;
     }
 
     public Integer getHigh_f() {

@@ -24,6 +24,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     public ListView dailyForecastListView;
     public RelativeLayout progressLayout;
     public ArrayList<DailyForecast> dailyForecastArray;
+    public DailyAdapter dailyAdapter;
     public ArrayAdapter<DailyForecast> dailyForecastArrayAdapter;
 
     @Override
@@ -39,10 +40,8 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         // Data setup
         weatherAPI = new WeatherAPI(this);
         dailyForecastArray = new ArrayList<DailyForecast>();
-        dailyForecastArrayAdapter = new ArrayAdapter<DailyForecast>(this,
-                android.R.layout.simple_list_item_1,
-                dailyForecastArray);
-        dailyForecastListView.setAdapter(dailyForecastArrayAdapter);
+        dailyAdapter = new DailyAdapter(this, dailyForecastArray);
+        dailyForecastListView.setAdapter(dailyAdapter);
     }
 
     @Override
@@ -91,26 +90,28 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     @Override
     public void onWeatherInfoRetrieved(JSONObject responseData, boolean error) {
         progressLayout.setVisibility(View.INVISIBLE);
-        try {
-            if (error) {
-                String err = responseData.getString("description");
-                mainTemperatureText.setText("N/A");
-            } else {
-                JSONObject current = responseData.getJSONObject("current_observation");
-                // Fahrenheit u2109
-                // Celcius u2103
-                mainTemperatureText.setText(current.getInt("temp_f") + "\u2109");
-                displayCurrentConditions(responseData);
-                displayHourlyForecast(responseData);
-                displayDailyForecast(responseData);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (error) {
+            displayCurrentConditions(responseData, error);
+        } else {
+            displayCurrentConditions(responseData, false);
+            displayHourlyForecast(responseData);
+            displayDailyForecast(responseData);
         }
     }
 
-    public void displayCurrentConditions(JSONObject data) {
+    public void displayCurrentConditions(JSONObject data, boolean error) {
+        try {
+            if (error) {
+                mainTemperatureText.setText("N/A");
+            } else {
+                JSONObject current = data.getJSONObject("current_observation");
+                // Fahrenheit u2109
+                // Celcius u2103
+                mainTemperatureText.setText(current.getInt("temp_f") + "\u2109");
+            }
+        } catch (JSONException e) {
 
+        }
     }
 
     public void displayHourlyForecast(JSONObject data) {
@@ -137,18 +138,19 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
                 // Get necessary values for daily forecast
                 String weekday = date.getString("weekday");
                 int day = date.getInt("day");
+                String conditions = row.getString("icon");
                 int high_f = high.getInt("fahrenheit");
                 int high_c  = high.getInt("celsius");
                 int low_f = low.getInt("fahrenheit");
                 int low_c = low.getInt("celsius");
 
                 // Add each day's forecast to list
-                DailyForecast dailyForecast = new DailyForecast(weekday, day, high_f, high_c, low_f, low_c);
+                DailyForecast dailyForecast = new DailyForecast(weekday, day, conditions, high_f, high_c, low_f, low_c);
                 dailyForecastArray.add(dailyForecast);
             }
 
             // Update listview array adapter
-            dailyForecastArrayAdapter.notifyDataSetChanged();
+            dailyAdapter.notifyDataSetChanged();
 
         } catch (JSONException e) {
             e.printStackTrace();
