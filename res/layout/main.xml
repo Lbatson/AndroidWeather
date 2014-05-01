@@ -4,11 +4,13 @@
              android:layout_height="match_parent">
     <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+            android:layout_height="fill_parent"
+            android:id="@+id/rl_background">
         <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="80dp"
+                android:textColor="#FFF"
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_marginTop="20dp"
                 android:id="@+id/tv_main_temp"/>

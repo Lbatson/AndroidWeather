@@ -3,6 +3,8 @@ package edu.apsu.csci4020.batson_kuwonu.weather;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.ArrayAdapter;
@@ -22,6 +24,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
 
     public TextView mainTemperatureText;
     public ListView dailyForecastListView;
+    public RelativeLayout background;
     public RelativeLayout progressLayout;
     public ArrayList<DailyForecast> dailyForecastArray;
     public DailyAdapter dailyAdapter;
@@ -35,6 +38,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         // View setup
         mainTemperatureText = (TextView) findViewById(R.id.tv_main_temp);
         dailyForecastListView = (ListView) findViewById(R.id.lv_daily_forecast);
+        background = (RelativeLayout) findViewById(R.id.rl_background);
         progressLayout = (RelativeLayout) findViewById(R.id.layout_progress);
 
         // Data setup
@@ -105,6 +109,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
                 mainTemperatureText.setText("N/A");
             } else {
                 JSONObject current = data.getJSONObject("current_observation");
+                background.setBackgroundColor(Color.parseColor(Background.staticMap.get("cloudy")));
                 // Fahrenheit u2109
                 // Celcius u2103
                 mainTemperatureText.setText(current.getInt("temp_f") + "\u2109");
