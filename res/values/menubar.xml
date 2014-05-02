@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--http://stackoverflow.com/a/14313108/1415348-->
+    <!--http://stackoverflow.com/a/12095926/1415348-->
     <style name="FinalWeatherTheme" parent="android:Theme.Holo.Light">
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
     </style>

@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MainActivity extends Activity implements SearchDialogFragment.SearchDialogListener, WeatherAPI.WeatherAPIListener {
 
@@ -106,8 +107,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     public void displayCurrentConditions(JSONObject data, boolean error) {
         try {
             if (error) {
-                mainTemperatureText.setText("N/A");
-                weatherConditionText.setText("");
+                setDefaultValues();
             } else {
                 JSONObject current = data.getJSONObject("current_observation");
                 currentConditions = new Conditions(
@@ -116,15 +116,35 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
                         current.getInt("temp_c"),
                         current.getString("icon")
                 );
-                background.setBackgroundColor(Color.parseColor(Background.staticMap.get("cloudy")));
                 // Fahrenheit u2109
                 // Celcius u2103
                 mainTemperatureText.setText(currentConditions.getTemp_f() + "\u2109");
                 weatherConditionText.setText(currentConditions.getWeather());
             }
+            setBackgroundColor();
         } catch (JSONException e) {
 
         }
+    }
+
+    public void setDefaultValues() {
+        currentConditions = null;
+        mainTemperatureText.setText("");
+        weatherConditionText.setText("");
+        dailyForecastListView.setVisibility(View.INVISIBLE);
+    }
+
+    public void setBackgroundColor() {
+        String bgColor = "";
+        for (Map.Entry<String, String> entry : Background.STATIC_MAP.entrySet()) {
+            if (currentConditions != null && currentConditions.getIcon().matches(".*" + entry.getKey() + "*.")) {
+                bgColor = entry.getValue();
+                break;
+            } else {
+                bgColor = Background.DEFAULT;
+            }
+        }
+        background.setBackgroundColor(Color.parseColor(bgColor));
     }
 
     public void displayHourlyForecast(JSONObject data) {
@@ -135,6 +155,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         try {
             // Remove data
             dailyForecastArray.clear();
+            dailyForecastListView.setVisibility(View.VISIBLE);
 
             // Get forecastday array of objects
             JSONObject forecast = data.getJSONObject("forecast");
