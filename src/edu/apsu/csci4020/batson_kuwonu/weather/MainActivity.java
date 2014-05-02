@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.*;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,12 +21,13 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     private WeatherAPI.DownloadTask downloadTask;
 
     public TextView mainTemperatureText;
+    public TextView weatherConditionText;
     public ListView dailyForecastListView;
     public RelativeLayout background;
     public RelativeLayout progressLayout;
+    public Conditions currentConditions;
     public ArrayList<DailyForecast> dailyForecastArray;
     public DailyAdapter dailyAdapter;
-    public ArrayAdapter<DailyForecast> dailyForecastArrayAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +36,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
 
         // View setup
         mainTemperatureText = (TextView) findViewById(R.id.tv_main_temp);
+        weatherConditionText = (TextView) findViewById(R.id.tv_weather_condition);
         dailyForecastListView = (ListView) findViewById(R.id.lv_daily_forecast);
         background = (RelativeLayout) findViewById(R.id.rl_background);
         progressLayout = (RelativeLayout) findViewById(R.id.layout_progress);
@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     public void onSearchPositiveClick(DialogFragment dialogFragment, String zip_code_value) {
         // Request weather data from zip code entry
         progressLayout.setVisibility(View.VISIBLE);
-        downloadTask = weatherAPI.retrieveWeatherInfo(zip_code_value);
+        downloadTask = weatherAPI.retrieveWeatherInfoByZip(zip_code_value);
     }
 
     @Override
@@ -107,12 +107,20 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         try {
             if (error) {
                 mainTemperatureText.setText("N/A");
+                weatherConditionText.setText("");
             } else {
                 JSONObject current = data.getJSONObject("current_observation");
+                currentConditions = new Conditions(
+                        current.getString("weather"),
+                        current.getInt("temp_f"),
+                        current.getInt("temp_c"),
+                        current.getString("icon")
+                );
                 background.setBackgroundColor(Color.parseColor(Background.staticMap.get("cloudy")));
                 // Fahrenheit u2109
                 // Celcius u2103
-                mainTemperatureText.setText(current.getInt("temp_f") + "\u2109");
+                mainTemperatureText.setText(currentConditions.getTemp_f() + "\u2109");
+                weatherConditionText.setText(currentConditions.getWeather());
             }
         } catch (JSONException e) {
 
@@ -133,7 +141,8 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
             JSONObject simpleforecast = forecast.getJSONObject("simpleforecast");
             JSONArray forecastday = simpleforecast.getJSONArray("forecastday");
 
-            for (int i = 0; i < forecastday.length(); i++) {
+            // 7 day forecast
+            for (int i = 0; i < forecastday.length() - 3; i++) {
                 // Get JSON objects
                 JSONObject row = forecastday.getJSONObject(i);
                 JSONObject date = row.getJSONObject("date");

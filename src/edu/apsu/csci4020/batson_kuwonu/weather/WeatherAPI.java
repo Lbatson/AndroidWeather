@@ -26,7 +26,7 @@ public class WeatherAPI {
         API_URL = context.getResources().getString(R.string.api_url);
     }
 
-    public DownloadTask retrieveWeatherInfo(String location) {
+    public DownloadTask retrieveWeatherInfoByZip(String location) {
         // Request weather info on separate thread
         DownloadTask downloadTask = new DownloadTask();
         downloadTask.execute(location);

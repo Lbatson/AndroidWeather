@@ -18,9 +18,10 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textSize="40dp"
+                android:textColor="#FFF"
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_marginTop="120dp"
-                android:id="@+id/tv_condition"/>
+                android:id="@+id/tv_weather_condition"/>
         <!--<HorizontalScrollView-->
                 <!--android:layout_width="fill_parent"-->
                 <!--android:layout_height="wrap_content">-->
@@ -33,7 +34,7 @@
         <ListView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_condition"
+                android:layout_below="@+id/tv_weather_condition"
                 android:clickable="false"
                 android:id="@+id/lv_daily_forecast"/>
     </RelativeLayout>

@@ -1,12 +1,9 @@
 package edu.apsu.csci4020.batson_kuwonu.weather;
 
-import edu.apsu.csci4020.batson_kuwonu.weather.R;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class Background {
-
     public static final Map<String, String> staticMap = new HashMap<String, String>();
     static {
         final Map<String, String> map = staticMap;
