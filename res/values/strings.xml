@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Constants-->
     <string name="app_name">FinalWeather</string>
     <string name="api_url">http://api.wunderground.com/api/44e104dc3950125e/conditions/forecast10day/hourly/q/</string>
-    <string name="search_title">Search below with your zip code</string>
-    <string name="search_positive">Search</string>
-    <string name="search_negative">Cancel</string>
+    <!--Dialogs-->
+    <string name="search_title">Search by zip code</string>
+    <string name="location_title">Search by current location</string>
+    <string name="dialog_positive">Search</string>
+    <string name="dialog_negative">Cancel</string>
 </resources>

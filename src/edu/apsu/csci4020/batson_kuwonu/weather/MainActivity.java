@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.google.android.gms.common.ConnectionResult;
+import android.widget.Toast;
+import com.google.android.gms.common.*;
+import com.google.android.gms.location.LocationClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +21,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
-
-public class MainActivity extends Activity implements SearchDialogFragment.SearchDialogListener, WeatherAPI.WeatherAPIListener {
+public class MainActivity extends Activity implements
+        SearchDialogFragment.SearchDialogListener,
+        LocationDialogFragment.LocationDialogListener,
+        WeatherAPI.WeatherAPIListener,
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener{
 
     private WeatherAPI weatherAPI;
     private WeatherAPI.DownloadTask downloadTask;
+    private LocationClient locationClient;
+    private Location location;
+    private boolean isConnected;
 
     public TextView mainTemperatureText;
     public TextView weatherConditionText;
@@ -47,6 +56,7 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         progressLayout = (RelativeLayout) findViewById(R.id.layout_progress);
 
         // Data setup
+        isConnected = false;
         weatherAPI = new WeatherAPI(this);
         dailyForecastArray = new ArrayList<DailyForecast>();
         dailyAdapter = new DailyAdapter(this, dailyForecastArray);
@@ -56,10 +66,12 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
     @Override
     protected void onResume() {
         super.onResume();
-        if (isGooglePlayServicesAvailable(getApplicationContext()) == ConnectionResult.SUCCESS) {
-            Log.i("GOOGLE PLAY SERVICES?", "yes");
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext()) == ConnectionResult.SUCCESS) {
+            // Create location client and connect
+            locationClient = new LocationClient(this, this, this);
+            locationClient.connect();
         } else {
-            Log.i("GOOGLE PLAY SERVICES?", "no");
+            Toast.makeText(this, "Unable to connect with Google Play Services", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -70,6 +82,10 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         if (downloadTask != null) {
             downloadTask.cancel(true);
             downloadTask = null;
+        }
+        // Disconnect location services
+        if (locationClient != null) {
+            locationClient.disconnect();
         }
     }
 
@@ -83,16 +99,18 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        FragmentManager fm = getFragmentManager();
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             // Present custom search dialog
             case R.id.action_search:
-                FragmentManager fm = getFragmentManager();
                 SearchDialogFragment searchDialogFragment = new SearchDialogFragment();
                 searchDialogFragment.show(fm, "fragment_search");
                 return true;
             // Present gps dialog
             case R.id.action_gps:
+                LocationDialogFragment locationDialogFragment = new LocationDialogFragment();
+                locationDialogFragment.show(fm, "fragment_location");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -104,6 +122,19 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         // Request weather data from zip code entry
         progressLayout.setVisibility(View.VISIBLE);
         downloadTask = weatherAPI.retrieveWeatherInfoByZip(zip_code_value);
+    }
+
+
+    @Override
+    public void onLocationPositiveClick(DialogFragment dialogFragment) {
+        if (isConnected) {
+            // Request weather data from location information
+            progressLayout.setVisibility(View.VISIBLE);
+            location = locationClient.getLastLocation();
+            downloadTask = weatherAPI.retrieveWeatherInfoByLocation(location.getLatitude(), location.getLongitude());
+        } else {
+            Toast.makeText(this, "Unable to get current location information", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -118,10 +149,18 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         }
     }
 
+    public void resetDisplay() {
+        currentConditions = null;
+        mainTemperatureText.setText("");
+        weatherConditionText.setText("");
+        dailyForecastListView.setVisibility(View.INVISIBLE);
+    }
+
     public void displayCurrentConditions(JSONObject data, boolean error) {
         try {
             if (error) {
-                setDefaultValues();
+                resetDisplay();
+                Toast.makeText(this, "Unable to find location", Toast.LENGTH_SHORT).show();
             } else {
                 JSONObject current = data.getJSONObject("current_observation");
                 currentConditions = new Conditions(
@@ -139,13 +178,6 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         } catch (JSONException e) {
 
         }
-    }
-
-    public void setDefaultValues() {
-        currentConditions = null;
-        mainTemperatureText.setText("");
-        weatherConditionText.setText("");
-        dailyForecastListView.setVisibility(View.INVISIBLE);
     }
 
     public void setBackgroundColor() {
@@ -204,5 +236,23 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        // Location client is connected
+        isConnected = true;
+    }
+
+    @Override
+    public void onDisconnected() {
+        // Location client is disconnected
+        isConnected = false;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // Failure to connect
+        isConnected = false;
     }
 }

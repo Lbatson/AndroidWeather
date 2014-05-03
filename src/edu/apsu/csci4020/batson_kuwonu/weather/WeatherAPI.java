@@ -33,6 +33,12 @@ public class WeatherAPI {
         return downloadTask;
     }
 
+    public DownloadTask retrieveWeatherInfoByLocation(double latitude, double longitude) {
+        DownloadTask downloadTask = new DownloadTask();
+        downloadTask.execute(latitude + "," + longitude);
+        return downloadTask;
+    }
+
     public class DownloadTask extends AsyncTask<String, Void, Void> {
 
         @Override

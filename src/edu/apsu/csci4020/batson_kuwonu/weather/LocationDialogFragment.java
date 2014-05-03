@@ -6,39 +6,29 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.EditText;
 
-public class SearchDialogFragment extends DialogFragment{
+public class LocationDialogFragment extends DialogFragment{
 
-    public interface SearchDialogListener {
-        public void onSearchPositiveClick(DialogFragment dialogFragment, String zip_code_value);
+    public interface LocationDialogListener {
+        public void onLocationPositiveClick(DialogFragment dialogFragment);
     }
 
     // Use this instance of the interface to deliver action events
-    SearchDialogListener mListener;
+    LocationDialogListener mListener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        // Get the layout inflater
-        final LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        final View view = inflater.inflate(R.layout.dialog_search, null);
-        builder.setView(view)
-                .setTitle(getResources().getString(R.string.search_title))
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getResources().getString(R.string.location_title))
                 .setPositiveButton(getResources().getString(R.string.dialog_positive), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        EditText et = (EditText) view.findViewById(R.id.et_zip_code);
-                        mListener.onSearchPositiveClick(SearchDialogFragment.this, et.getText().toString());
+                        mListener.onLocationPositiveClick(LocationDialogFragment.this);
                     }
                 })
                 .setNegativeButton(getResources().getString(R.string.dialog_negative), null);
-        // Create the AlertDialog object and return it
+
+        // Create the alert dialog
         return builder.create();
     }
 
@@ -49,7 +39,7 @@ public class SearchDialogFragment extends DialogFragment{
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the NoticeDialogListener so we can send events to the host
-            mListener = (SearchDialogListener) activity;
+            mListener = (LocationDialogListener) activity;
         } catch (ClassCastException e) {
             // If caught, the activity doesn't implement the interface
             e.printStackTrace();
