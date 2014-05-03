@@ -5,16 +5,20 @@ import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.google.android.gms.common.ConnectionResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
 
 public class MainActivity extends Activity implements SearchDialogFragment.SearchDialogListener, WeatherAPI.WeatherAPIListener {
 
@@ -47,6 +51,16 @@ public class MainActivity extends Activity implements SearchDialogFragment.Searc
         dailyForecastArray = new ArrayList<DailyForecast>();
         dailyAdapter = new DailyAdapter(this, dailyForecastArray);
         dailyForecastListView.setAdapter(dailyAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isGooglePlayServicesAvailable(getApplicationContext()) == ConnectionResult.SUCCESS) {
+            Log.i("GOOGLE PLAY SERVICES?", "yes");
+        } else {
+            Log.i("GOOGLE PLAY SERVICES?", "no");
+        }
     }
 
     @Override
