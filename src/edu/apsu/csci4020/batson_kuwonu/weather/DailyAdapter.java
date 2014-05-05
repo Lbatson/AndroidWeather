@@ -35,7 +35,7 @@ public class DailyAdapter extends BaseAdapter {
         return dailyForecastArrayList.indexOf(getItem(position));
     }
 
-    private class ViewHolder {
+    static class ViewHolder {
         TextView weekday;
         TextView day;
         TextView condition;
@@ -48,27 +48,31 @@ public class DailyAdapter extends BaseAdapter {
         ViewHolder holder = null;
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
+        // Create or get view
         if (convertView == null) {
-            // Get view items
             convertView = layoutInflater.inflate(R.layout.daily_list, null);
             holder = new ViewHolder();
-            holder.weekday = (TextView) convertView.findViewById(R.id.tv_daily_weekday);
-            holder.day = (TextView) convertView.findViewById(R.id.tv_daily_day);
-            holder.condition = (TextView) convertView.findViewById(R.id.tv_daily_conditions);
-            holder.high = (TextView) convertView.findViewById(R.id.tv_daily_high);
-            holder.low = (TextView) convertView.findViewById(R.id.tv_daily_low);
-
-            // Set view values
-            DailyForecast forecast = dailyForecastArrayList.get(position);
-            holder.weekday.setText(forecast.getWeekday());
-            holder.day.setText(forecast.getDay().toString());
-            holder.condition.setText(forecast.getCondition());
-            holder.high.setText(forecast.getHigh_f().toString());
-            holder.low.setText(forecast.getLow_f().toString());
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        // Access the view elements
+        holder.weekday = (TextView) convertView.findViewById(R.id.tv_daily_weekday);
+        holder.day = (TextView) convertView.findViewById(R.id.tv_daily_day);
+        holder.condition = (TextView) convertView.findViewById(R.id.tv_daily_conditions);
+        holder.high = (TextView) convertView.findViewById(R.id.tv_daily_high);
+        holder.low = (TextView) convertView.findViewById(R.id.tv_daily_low);
+
+        // Set view values
+        DailyForecast forecast = dailyForecastArrayList.get(position);
+        holder.weekday.setText(forecast.getWeekday());
+        holder.day.setText(forecast.getDay().toString());
+        holder.condition.setText(forecast.getCondition());
+        holder.high.setText(forecast.getHigh_f().toString());
+        holder.low.setText(forecast.getLow_f().toString());
+
+        // Insure the item remains in the proper spot in the list
+        convertView.setTag(holder);
         return convertView;
     }
 }

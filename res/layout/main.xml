@@ -22,19 +22,33 @@
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_marginTop="120dp"
                 android:id="@+id/tv_weather_condition"/>
-        <!--<HorizontalScrollView-->
-                <!--android:layout_width="fill_parent"-->
-                <!--android:layout_height="wrap_content">-->
-            <!--<ListView-->
-                    <!--android:layout_width="fill_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="220dp"-->
-                    <!--android:id="@+id/lv_hourly_forecast"/>-->
-        <!--</HorizontalScrollView>-->
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="20dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:layout_below="@+id/tv_weather_condition"
+                android:textStyle="bold"
+                android:textColor="#FFF"
+                android:text="Hourly Forecast"
+                android:id="@+id/tv_hourly_forecast"/>
+        <ListView
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"
+                android:layout_below="@+id/tv_hourly_forecast"
+                android:id="@+id/lv_hourly_forecast"/>
+        <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="20dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:layout_below="@+id/lv_hourly_forecast"
+                android:textStyle="bold"
+                android:textColor="#FFF"
+                android:text="Daily Forecast"
+                android:id="@+id/tv_daily_forecast"/>
         <ListView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_weather_condition"
+                android:layout_below="@+id/tv_daily_forecast"
                 android:clickable="false"
                 android:id="@+id/lv_daily_forecast"/>
     </RelativeLayout>

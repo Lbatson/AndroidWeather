@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.*;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -36,10 +35,15 @@ public class MainActivity extends Activity implements
 
     public TextView mainTemperatureText;
     public TextView weatherConditionText;
+    public TextView hourlyTitleText;
+    public ListView hourlyForecastListView;
+    public TextView dailyTitleText;
     public ListView dailyForecastListView;
     public RelativeLayout background;
     public RelativeLayout progressLayout;
     public Conditions currentConditions;
+    public ArrayList<HourlyForecast> hourlyForecastArray;
+    public HourlyAdapter hourlyAdapter;
     public ArrayList<DailyForecast> dailyForecastArray;
     public DailyAdapter dailyAdapter;
 
@@ -51,6 +55,9 @@ public class MainActivity extends Activity implements
         // View setup
         mainTemperatureText = (TextView) findViewById(R.id.tv_main_temp);
         weatherConditionText = (TextView) findViewById(R.id.tv_weather_condition);
+        hourlyTitleText = (TextView) findViewById(R.id.tv_hourly_forecast);
+        hourlyForecastListView = (ListView) findViewById(R.id.lv_hourly_forecast);
+        dailyTitleText = (TextView) findViewById(R.id.tv_daily_forecast);
         dailyForecastListView = (ListView) findViewById(R.id.lv_daily_forecast);
         background = (RelativeLayout) findViewById(R.id.rl_background);
         progressLayout = (RelativeLayout) findViewById(R.id.layout_progress);
@@ -58,6 +65,9 @@ public class MainActivity extends Activity implements
         // Data setup
         isConnected = false;
         weatherAPI = new WeatherAPI(this);
+        hourlyForecastArray = new ArrayList<HourlyForecast>();
+        hourlyAdapter = new HourlyAdapter(this, hourlyForecastArray);
+        hourlyForecastListView.setAdapter(hourlyAdapter);
         dailyForecastArray = new ArrayList<DailyForecast>();
         dailyAdapter = new DailyAdapter(this, dailyForecastArray);
         dailyForecastListView.setAdapter(dailyAdapter);
@@ -73,6 +83,7 @@ public class MainActivity extends Activity implements
         } else {
             Toast.makeText(this, "Unable to connect with Google Play Services", Toast.LENGTH_SHORT).show();
         }
+        clearDisplay();
     }
 
     @Override
@@ -149,17 +160,20 @@ public class MainActivity extends Activity implements
         }
     }
 
-    public void resetDisplay() {
+    public void clearDisplay() {
         currentConditions = null;
         mainTemperatureText.setText("");
         weatherConditionText.setText("");
+        hourlyTitleText.setVisibility(View.INVISIBLE);
+        hourlyForecastListView.setVisibility(View.INVISIBLE);
+        dailyTitleText.setVisibility(View.INVISIBLE);
         dailyForecastListView.setVisibility(View.INVISIBLE);
     }
 
     public void displayCurrentConditions(JSONObject data, boolean error) {
         try {
             if (error) {
-                resetDisplay();
+                clearDisplay();
                 Toast.makeText(this, "Unable to find location", Toast.LENGTH_SHORT).show();
             } else {
                 JSONObject current = data.getJSONObject("current_observation");
@@ -176,7 +190,7 @@ public class MainActivity extends Activity implements
             }
             setBackgroundColor();
         } catch (JSONException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -194,13 +208,46 @@ public class MainActivity extends Activity implements
     }
 
     public void displayHourlyForecast(JSONObject data) {
+        try {
+            // Remove data
+            hourlyForecastArray.clear();
+            hourlyTitleText.setVisibility(View.VISIBLE);
+            hourlyForecastListView.setVisibility(View.VISIBLE);
 
+            // Get hourly forecast array of objects
+            JSONArray hourlyForecastJSONArray = data.getJSONArray("hourly_forecast");
+
+            // Hourly forecast
+            for (int i = 0; i < hourlyForecastJSONArray.length(); i++) {
+                // Get JSON Objects
+                JSONObject row = hourlyForecastJSONArray.getJSONObject(i);
+                JSONObject timeinfo = row.getJSONObject("FCTTIME");
+                JSONObject temp = row.getJSONObject("temp");
+
+                // Get necessary values for hourly forecast
+                String weekday_abbr = timeinfo.getString("weekday_name_abbrev");
+                String time = timeinfo.getString("civil");
+                String condition = row.getString("icon");
+                int temp_english = temp.getInt("english");
+                int temp_metric = temp.getInt("metric");
+
+                HourlyForecast hourlyForecast = new HourlyForecast(weekday_abbr, time, condition, temp_english, temp_metric);
+                hourlyForecastArray.add(hourlyForecast);
+            }
+
+            // Update listview array adapter
+            hourlyAdapter.notifyDataSetChanged();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void displayDailyForecast(JSONObject data) {
         try {
             // Remove data
             dailyForecastArray.clear();
+            dailyTitleText.setVisibility(View.VISIBLE);
             dailyForecastListView.setVisibility(View.VISIBLE);
 
             // Get forecastday array of objects
@@ -209,7 +256,7 @@ public class MainActivity extends Activity implements
             JSONArray forecastday = simpleforecast.getJSONArray("forecastday");
 
             // 7 day forecast
-            for (int i = 0; i < forecastday.length() - 3; i++) {
+            for (int i = 0; i < forecastday.length(); i++) {
                 // Get JSON objects
                 JSONObject row = forecastday.getJSONObject(i);
                 JSONObject date = row.getJSONObject("date");
