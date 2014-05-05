@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements
     private Location location;
     private boolean isConnected;
 
+    public TextView currentLocationText;
     public TextView mainTemperatureText;
     public TextView weatherConditionText;
     public TextView hourlyTitleText;
@@ -53,6 +54,7 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.main);
 
         // View setup
+        currentLocationText = (TextView) findViewById(R.id.tv_location);
         mainTemperatureText = (TextView) findViewById(R.id.tv_main_temp);
         weatherConditionText = (TextView) findViewById(R.id.tv_weather_condition);
         hourlyTitleText = (TextView) findViewById(R.id.tv_hourly_forecast);
@@ -161,7 +163,9 @@ public class MainActivity extends Activity implements
     }
 
     public void clearDisplay() {
+        // Used to reset display if error
         currentConditions = null;
+        currentLocationText.setText("");
         mainTemperatureText.setText("");
         weatherConditionText.setText("");
         hourlyTitleText.setVisibility(View.INVISIBLE);
@@ -176,7 +180,10 @@ public class MainActivity extends Activity implements
                 clearDisplay();
                 Toast.makeText(this, "Unable to find location", Toast.LENGTH_SHORT).show();
             } else {
+                // Get and display current location and conditions
                 JSONObject current = data.getJSONObject("current_observation");
+                JSONObject display_location = current.getJSONObject("display_location");
+                currentLocationText.setText(display_location.getString("full"));
                 currentConditions = new Conditions(
                         current.getString("weather"),
                         current.getInt("temp_f"),
@@ -196,6 +203,7 @@ public class MainActivity extends Activity implements
 
     public void setBackgroundColor() {
         String bgColor = "";
+        // Loop over HashMap to find matches for background color
         for (Map.Entry<String, String> entry : Background.STATIC_MAP.entrySet()) {
             if (currentConditions != null && currentConditions.getIcon().matches(".*" + entry.getKey() + "*.")) {
                 bgColor = entry.getValue();
